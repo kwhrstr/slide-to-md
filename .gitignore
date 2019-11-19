@@ -3,5 +3,4 @@ slide-to-md.cabal
 *.json
 *.idea/
 *.iml
-test.md
 *~

@@ -30,7 +30,6 @@ dependencies:
 - gogol-slides
 - lens
 - text
-- aeson
 
 library:
   source-dirs: src

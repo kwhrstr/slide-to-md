@@ -2,7 +2,7 @@ module Slide2Md where
 
 import RIO
 import qualified RIO.Text as T
-import qualified RIO.Text.Partial as T (head, replace, tail)
+import qualified RIO.Text.Partial as T (replace)
 import Network.Google.Resource.Slides.Presentations.Get
 import Network.Google.Slides
 import Network.Google
@@ -17,6 +17,7 @@ import System.Environment
 type PresentationID = Text
 data MdContent = ContShape Shape | ContTable Table
 
+
 run :: IO ()
 run = do
   args <- getArgs
@@ -27,12 +28,12 @@ run = do
 runConvert :: FilePath -> PresentationID -> IO ()
 runConvert testJson testID = do
   p <- getPresentation testJson testID
-  let maybeTitle = p ^. preTitle
+  let title = fromMaybe "no-title" $ p ^. preTitle
       mdTexts = p ^. preSlides
              & map (view pPageElements)
              & map (mapMaybe toMdContent)
              & concatMap (map toMdTexts)
-  writeFileUtf8 "test.md"  $ T.unlines mdTexts
+  writeFileUtf8 (T.unpack $ title <> ".md")  $ T.unlines mdTexts
 
 
 getPresentation :: FilePath -> PresentationID -> IO Presentation
@@ -55,10 +56,10 @@ toMdTexts (ContShape sh) =
     Nothing -> ""
     Just PTTitle -> "## " <> tcToMdText tc
     Just _ -> tcToMdText tc
-toMdTexts (ContTable tb) = "unimplrement"
+toMdTexts (ContTable tb) = "unimplement yet" --TODO
 
 
-tcToMdText :: Maybe TextContent  ->Text
+tcToMdText :: Maybe TextContent -> Text
 tcToMdText Nothing  = ""
 tcToMdText (Just tc)  =
   let tes = tc ^. tcTextElements
@@ -70,15 +71,15 @@ textRunMd :: TextElement -> Maybe Text
 textRunMd te = do
   tr <- te ^. teTextRun
   t <- tr ^. trContent
-  pure $ trace t  $ T.replace "\n" "  \n"  t
+  pure $ trace t $ T.replace "\n" "  \n"  t
 
 
-prefixMd :: TextElement  -> Maybe Text
+prefixMd :: TextElement -> Maybe Text
 prefixMd te = do
   b <- te ^. teParagraphMarker >>= (^. pmBullet)
   let nest = fromMaybe 0 (view bNestingLevel b)
-  glyph <- b ^. bGlyph
-  let mdBullet = if isAlphaNum (T.head glyph) then "1. " else "+ "
+  glyph <- T.take 1 <$> b ^. bGlyph
+  let mdBullet = if T.any isAlphaNum glyph then "1. " else "+ "
   pure $ T.replicate (4 * fromIntegral nest) " " <> mdBullet
 
 
