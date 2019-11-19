@@ -1,0 +1,6 @@
+.stack-work/
+slide-to-md.cabal
+*.json
+*.idea/
+*.iml
+*~
