@@ -70,7 +70,7 @@ textRunMd :: TextElement -> Maybe Text
 textRunMd te = do
   tr <- te ^. teTextRun
   t <- tr ^. trContent
-  pure $ T.replace "\n" "  \n"  t
+  pure $ trace t T.replace "\n" "  \n"  t
 
 
 prefixMd :: TextElement -> Maybe Text
