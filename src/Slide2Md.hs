@@ -6,7 +6,6 @@ import qualified RIO.Text.Partial as T (replace)
 import Network.Google.Resource.Slides.Presentations.Get
 import Network.Google.Slides
 import Network.Google
-import Network.Google.Auth.ServiceAccount
 import Network.Google.Auth
 import Control.Lens ((.~))
 import RIO.Char
@@ -56,7 +55,7 @@ toMdTexts (ContShape sh) =
     Nothing -> ""
     Just PTTitle -> "## " <> tcToMdText tc
     Just _ -> tcToMdText tc
-toMdTexts (ContTable tb) = "unimplement yet" --TODO
+--toMdTexts (ContTable tb) = "unimplemented yet" --TODO implement
 
 
 tcToMdText :: Maybe TextContent -> Text
@@ -71,7 +70,7 @@ textRunMd :: TextElement -> Maybe Text
 textRunMd te = do
   tr <- te ^. teTextRun
   t <- tr ^. trContent
-  pure $ trace t $ T.replace "\n" "  \n"  t
+  pure $ T.replace "\n" "  \n"  t
 
 
 prefixMd :: TextElement -> Maybe Text

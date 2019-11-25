@@ -33,6 +33,7 @@ dependencies:
 
 library:
   source-dirs: src
+  ghc-options: -Wall
 
 executables:
   slide-to-md-exe:
